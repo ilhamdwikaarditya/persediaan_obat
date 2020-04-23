@@ -302,32 +302,24 @@ $(document).ready(function() {
 			$("#batch_obat").val("batch-"+formatDate(filter_tanggal));
 		}
 		
-		$.ajax({
-			url: '<?php echo site_url()?>/Gudang/Obat_in_Gudang',
-			type: 'post',
-			data: {param:batchobat},
-			dataType: 'json',
-			success: function(response){
-				$('#IngudangTbl').DataTable().clear().draw();
-				$('#IngudangTbl').DataTable({
-					destroy: true,	
-					"bPaginate": false,
-					"bLengthChange": false,
-					"bFilter": false,
-					"bInfo": false,
-					"bAutoWidth": false,
-					"processing": true,
-					"serverSide": true,
-					"ajax": 
-					{
-						"url": "<?php echo site_url('Gudang/Obat_in_Gudang')?>",
-						"type": 'POST',
-						"data": {param:batchobat},						
-					},
-				});
-				
-			}
-		})
+		$('#IngudangTbl').DataTable().clear().draw();
+		$('#IngudangTbl').DataTable({
+			destroy: true,	
+			"bPaginate": false,
+			"bLengthChange": false,
+			"bFilter": false,
+			"bInfo": false,
+			"bAutoWidth": false,
+			"processing": true,
+			"serverSide": true,
+			"ajax": 
+			{
+				"url": "<?php echo site_url('Gudang/Obat_in_Gudang')?>",
+				"type": 'POST',
+				"data": {param:batchobat},						
+			},
+		});
+
 	});
 	
 	IngudangTbl = $('#IngudangTbl').DataTable({ 

@@ -157,12 +157,25 @@ class Puskesmas_mdl extends CI_Model {
 			return $query->result();
 		}else{
 			$txtcari = $var['batch'];
-			$this->db->select('*,SUM(JUMLAH) STOK, tr_satuan.satuan NM_SATUAN');
+			/* $this->db->select('*,(SUM( a.JUMLAH - b.JUMLAH )) STOK, tr_satuan.satuan NM_SATUAN');
 			$this->db->from('obat_in_gudang');
 			$this->db->join('tr_satuan','obat_in_gudang.satuan = tr_satuan.id_satuan');
+			$this->db->join('obat_in_puskesmas','CONCAT(a.BATCH_OBAT,a.NAMA_OBAT) = CONCAT(b.BATCH_OBAT,b.NAMA_OBAT)');
 			$this->db->like('BATCH_OBAT',$txtcari);
 			$this->db->group_by('NAMA_OBAT,BATCH_OBAT');
-			$query = $this->db->get();	
+			$query = $this->db->get(); */
+			$query = $this->db->query("SELECT
+											a.*,
+											(SUM( a.JUMLAH - b.JUMLAH )) STOK,
+											RIGHT ( a.BATCH_OBAT, 8 ) BATCH 
+										FROM
+											obat_in_gudang a
+										JOIN obat_in_puskesmas b ON CONCAT(a.BATCH_OBAT,a.NAMA_OBAT) = CONCAT(b.BATCH_OBAT,b.NAMA_OBAT)
+										WHERE
+											a.BATCH_OBAT LIKE '%$txtcari%'
+										GROUP BY
+											a.NAMA_OBAT,
+											a.BATCH_OBAT");
 			return $query->result();
 		}
 	}

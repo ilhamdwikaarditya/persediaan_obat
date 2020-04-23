@@ -10,7 +10,7 @@ class Mmenu extends CI_Model {
 
 public function validate($username,$password){
 	$app='2';
-	$this->db->select("user_name,password,type,nama,ket");
+	$this->db->select("id_user,user_name,password,type,nama,ket");
 	$this->db->from("USER");
 	$this->db->where("user_name",$username);
 	$sql = $this->db->get();
@@ -20,11 +20,12 @@ public function validate($username,$password){
 		if(md5($password)==$resulte['password']){		
 				$hasil=true;				
 				$data = array(
-				'user' => $username,
-				'app' => $app,
-				'ket' => $resulte['ket'],
-				'nama'=> $resulte['nama'],
-				'type'=> $resulte['type']
+					'user' => $username,
+					'app' => $app,
+					'id_user' => $resulte['id_user'],
+					'ket' => $resulte['ket'],
+					'nama'=> $resulte['nama'],
+					'type'=> $resulte['type']
 				);
 				$this->session->set_userdata($data);			
 		}else{
@@ -135,7 +136,7 @@ public function active_menu() {
 		return $hasil;
 	}
 	
-	function totcust(){
+	function totpasiendaftar(){
 		$this->db->from('pasien');
 		$query = $this->db->get();
 		$rowcount = $query->num_rows();
@@ -143,177 +144,28 @@ public function active_menu() {
 		return $rowcount;
 	}
 	
-	function totlang(){
-		$this->db->from('dil_listrik_new');
+	function totpasienhariini(){
+		$this->db->from('pasien');
+		$this->db->where('DATE(CDATE)',date("Y-m-d"));
 		$query = $this->db->get();
 		$rowcount = $query->num_rows();
 
 		return $rowcount;
 	}
 	
-	function totkwh(){
-		$kwh = $this->db->query("Select Sum(PEMKWH) PEMKWH From billing_listrik_ref")->row("PEMKWH");
-		return $kwh;
-	}
-	
-	function totrptag(){
-		$rptag = $this->db->query("Select Sum(RPTAG) RPTAG From billing_listrik_ref")->row("RPTAG");
-		return $rptag;
-	}
-	
-	function totlogin(){
-		$this->db->from('user');
-		$this->db->where('sts','1');
+	function totobat(){
+		$this->db->from('obat');
 		$query = $this->db->get();
 		$rowcount = $query->num_rows();
 
 		return $rowcount;
 	}
 	
-	function totlogout(){
-		$this->db->from('user');
-		$this->db->where('sts','0');
-		$query = $this->db->get();
-		$rowcount = $query->num_rows();
+	function totobatakanexpired(){
+		$total = $this->db->query("select sum(jumlah) totalobat from obat_in_gudang WHERE DATEDIFF(EXPIRED,now()) < 30")->row("totalobat");
+		return $total;
+	}	
 
-		return $rowcount;
-	}
-	
-	function totrpepi(){
-		$this->db->select('SUM(RP_EPI) RPEPI');
-		$this->db->from('billing_listrik_ref');
-		$query = $this->db->get();
-		$ret = $query->row();
-		return $ret->RPEPI;
-	}
-
-	function get_chart_langbyarea(){
-		$query = $this->db->query("select b.nm_area area, count(a.id_lang) jml
-									from dil_listrik_ref a
-									join tr_area b on a.kd_area=b.kd_area
-									group by a.kd_area ");
-		return $all = $query->result();
-	}
-	
-	function get_chart_langbygol(){
-		$query = $this->db->query("select b.uraian gol, count(a.id_lang) jml
-									from dil_listrik_ref a
-									join tr_golongan b on a.kogol=b.kd_gol
-									group by a.kogol ");
-		return $all = $query->result();
-	}
-	
-	function get_chart_dayabyarea(){
-		$query = $this->db->query("select b.nm_area area, sum(a.daya) jml
-									from dil_listrik_ref a
-									join tr_area b on a.kd_area=b.kd_area
-									group by a.kd_area ");
-		return $all = $query->result();
-	}
-	
-	function get_chart_dayabygol(){
-		$query = $this->db->query("select b.uraian gol, sum(a.daya) jml
-									from dil_listrik_ref a
-									join tr_golongan b on a.kogol=b.kd_gol
-									group by a.kogol ");
-		return $all = $query->result();
-	}
-	
-	function get_chart_kwhbyarea(){
-		$query = $this->db->query("select b.nm_area area, sum(a.PEMKWH) jml
-									from billing_listrik_ref a
-									join tr_area b on a.kd_area=b.kd_area
-									group by a.kd_area ");
-		return $all = $query->result();
-	}
-	
-	function get_chart_kwhbygol(){
-		$query = $this->db->query("select b.uraian gol, sum(a.PEMKWH) jml
-									from billing_listrik_ref a
-									join tr_golongan b on a.kogol=b.kd_gol
-									group by a.kogol ");
-		return $all = $query->result();
-	}
-	
-	function get_chart_pendapatanbyarea(){
-		$query = $this->db->query("select b.nm_area area, sum(a.RPTAG) jml
-									from billing_listrik_ref a
-									join tr_area b on a.kd_area=b.kd_area
-									group by a.kd_area ");
-		return $all = $query->result();
-	}
-	
-	function get_chart_pendapatanbygol(){
-		$query = $this->db->query("select b.uraian gol, sum(a.RPTAG) jml
-									from billing_listrik_ref a
-									join tr_golongan b on a.kogol=b.kd_gol
-									group by a.kogol ");
-		return $all = $query->result();
-	}
-	
-	function get_grafik_kwh(){
-		$query = $this->db->query("select Tahun, sum(a.Januari) Januari,sum(a.Februari) Februari,sum(a.Maret) Maret,sum(a.April) April,sum(a.Mei) Mei,sum(a.Juni) Juni,sum(a.Juli) Juli,sum(a.Agustus) Agustus,sum(a.September) September,sum(a.Oktober) Oktober,sum(a.November) November,sum(a.Desember) Desember, sum(a.Januarikom) Januarikom,sum(a.Februarikom) Februarikom,sum(a.Maretkom) Maretkom,sum(a.Aprilkom) Aprilkom,sum(a.Meikom) Meikom,sum(a.Junikom) Junikom,sum(a.Julikom) Julikom,sum(a.Agustuskom) Agustuskom,sum(a.Septemberkom) Septemberkom,sum(a.Oktoberkom) Oktoberkom,sum(a.Novemberkom) Novemberkom,sum(a.Desemberkom) Desemberkom from (
-									select Tahun,
-										case when Nama_Bulan = 'Januari' Then Target_KWH_Bln else 0 End Januari,
-										case when Nama_Bulan = 'Februari' Then Target_KWH_Bln else 0 End Februari,
-										case when Nama_Bulan = 'Maret' Then Target_KWH_Bln else 0 End Maret,
-										case when Nama_Bulan = 'April' Then Target_KWH_Bln else 0 End April,
-										case when Nama_Bulan = 'Mei' Then Target_KWH_Bln else 0 End Mei,
-										case when Nama_Bulan = 'Juni' Then Target_KWH_Bln else 0 End Juni,
-										case when Nama_Bulan = 'Juli' Then Target_KWH_Bln else 0 End Juli,
-										case when Nama_Bulan = 'Agustus' Then Target_KWH_Bln else 0 End Agustus,
-										case when Nama_Bulan = 'September' Then Target_KWH_Bln else 0 End September,
-										case when Nama_Bulan = 'Oktober' Then Target_KWH_Bln else 0 End Oktober,
-										case when Nama_Bulan = 'November' Then Target_KWH_Bln else 0 End November,
-										case when Nama_Bulan = 'Desember' Then Target_KWH_Bln else 0 End Desember,
-										
-										case when Nama_Bulan = 'Januari' Then Real_KWH_Bln else 0 End Januarikom,
-										case when Nama_Bulan = 'Februari' Then Real_KWH_Bln else 0 End Februarikom,
-										case when Nama_Bulan = 'Maret' Then Real_KWH_Bln else 0 End Maretkom,
-										case when Nama_Bulan = 'April' Then Real_KWH_Bln else 0 End Aprilkom,
-										case when Nama_Bulan = 'Mei' Then Real_KWH_Bln else 0 End Meikom,
-										case when Nama_Bulan = 'Juni' Then Real_KWH_Bln else 0 End Junikom,
-										case when Nama_Bulan = 'Juli' Then Real_KWH_Bln else 0 End Julikom,
-										case when Nama_Bulan = 'Agustus' Then Real_KWH_Bln else 0 End Agustuskom,
-										case when Nama_Bulan = 'September' Then Real_KWH_Bln else 0 End Septemberkom,
-										case when Nama_Bulan = 'Oktober' Then Real_KWH_Bln else 0 End Oktoberkom,
-										case when Nama_Bulan = 'November' Then Real_KWH_Bln else 0 End Novemberkom,
-										case when Nama_Bulan = 'Desember' Then Real_KWH_Bln else 0 End Desemberkom
-									From v_target_dan_realisasi) a GROUP BY Tahun order by tahun desc limit 1 ");
-		return $all = $query->result_array();
-	}
-	
-	function get_grafik_income(){
-		$query = $this->db->query("select Tahun, sum(a.Januari) Januari,sum(a.Februari) Februari,sum(a.Maret) Maret,sum(a.April) April,sum(a.Mei) Mei,sum(a.Juni) Juni,sum(a.Juli) Juli,sum(a.Agustus) Agustus,sum(a.September) September,sum(a.Oktober) Oktober,sum(a.November) November,sum(a.Desember) Desember, sum(a.Januarikom) Januarikom,sum(a.Februarikom) Februarikom,sum(a.Maretkom) Maretkom,sum(a.Aprilkom) Aprilkom,sum(a.Meikom) Meikom,sum(a.Junikom) Junikom,sum(a.Julikom) Julikom,sum(a.Agustuskom) Agustuskom,sum(a.Septemberkom) Septemberkom,sum(a.Oktoberkom) Oktoberkom,sum(a.Novemberkom) Novemberkom,sum(a.Desemberkom) Desemberkom from (
-									select Tahun,
-										case when Nama_Bulan = 'Januari' Then Target_Rp else 0 End Januari,
-										case when Nama_Bulan = 'Februari' Then Target_Rp else 0 End Februari,
-										case when Nama_Bulan = 'Maret' Then Target_Rp else 0 End Maret,
-										case when Nama_Bulan = 'April' Then Target_Rp else 0 End April,
-										case when Nama_Bulan = 'Mei' Then Target_Rp else 0 End Mei,
-										case when Nama_Bulan = 'Juni' Then Target_Rp else 0 End Juni,
-										case when Nama_Bulan = 'Juli' Then Target_Rp else 0 End Juli,
-										case when Nama_Bulan = 'Agustus' Then Target_Rp else 0 End Agustus,
-										case when Nama_Bulan = 'September' Then Target_Rp else 0 End September,
-										case when Nama_Bulan = 'Oktober' Then Target_Rp else 0 End Oktober,
-										case when Nama_Bulan = 'November' Then Target_Rp else 0 End November,
-										case when Nama_Bulan = 'Desember' Then Target_Rp else 0 End Desember,
-										
-										case when Nama_Bulan = 'Januari' Then Target_Kum_Rp else 0 End Januarikom,
-										case when Nama_Bulan = 'Februari' Then Target_Kum_Rp else 0 End Februarikom,
-										case when Nama_Bulan = 'Maret' Then Target_Kum_Rp else 0 End Maretkom,
-										case when Nama_Bulan = 'April' Then Target_Kum_Rp else 0 End Aprilkom,
-										case when Nama_Bulan = 'Mei' Then Target_Kum_Rp else 0 End Meikom,
-										case when Nama_Bulan = 'Juni' Then Target_Kum_Rp else 0 End Junikom,
-										case when Nama_Bulan = 'Juli' Then Target_Kum_Rp else 0 End Julikom,
-										case when Nama_Bulan = 'Agustus' Then Target_Kum_Rp else 0 End Agustuskom,
-										case when Nama_Bulan = 'September' Then Target_Kum_Rp else 0 End Septemberkom,
-										case when Nama_Bulan = 'Oktober' Then Target_Kum_Rp else 0 End Oktoberkom,
-										case when Nama_Bulan = 'November' Then Target_Kum_Rp else 0 End Novemberkom,
-										case when Nama_Bulan = 'Desember' Then Target_Kum_Rp else 0 End Desemberkom
-									From tp_target) a GROUP BY Tahun order by tahun desc limit 1 ");
-		return $all = $query->result_array();
-	}
 	
 }
 ?>

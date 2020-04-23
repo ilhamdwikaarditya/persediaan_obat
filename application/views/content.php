@@ -19,7 +19,7 @@
 					<div class="dashboard-stat2">
 						<div class="display">
 							<div class="number">
-								<h3 class="font-green-sharp"><?php echo "193"?><small class="font-green-sharp"></small></h3>
+								<h3 class="font-green-sharp"><?php echo $totpasiendaftar; ?><small class="font-green-sharp"></small></h3>
 								<small>TOTAL PASIEN TERDAFTAR</small>
 							</div>
 							<div class="icon">
@@ -46,7 +46,7 @@
 					<div class="dashboard-stat2">
 						<div class="display">
 							<div class="number">
-								<h3 class="font-red-haze"><?php echo "24"?></h3>
+								<h3 class="font-red-haze"><?php echo $totpasienhariini; ?></h3>
 								<small>TOTAL PASIEN HARI INI</small>
 							</div>
 							<div class="icon">
@@ -73,7 +73,7 @@
 					<div class="dashboard-stat2">
 						<div class="display">
 							<div class="number">
-								<h3 class="font-blue-sharp"><?php echo number_format("2430")?></h3>
+								<h3 class="font-blue-sharp"><?php echo $totobat; ?></h3>
 								<small>TOTAL OBAT</small>
 							</div>
 							<div class="icon">
@@ -100,7 +100,7 @@
 					<div class="dashboard-stat2">
 						<div class="display">
 							<div class="number">
-								<h3 class="font-purple-soft"><font size="5"><?php echo number_format("122")?></font></h3>
+								<h3 class="font-purple-soft"><font size="5"><?php echo $totobatakanexpired; ?></font></h3>
 								<small>TOTAL OBAT AKAN EXPIRED</small>
 							</div>
 							<div class="icon">
@@ -131,7 +131,7 @@
 						<div class="portlet-title">
 							<div class="caption">
 								<i class="icon-bar-chart font-green-haze"></i>
-								<span class="caption-subject bold uppercase font-green-haze"> Grafik Penyakit Terbanyak</span>
+								<span class="caption-subject bold uppercase font-green-haze"> Grafik Obat Terbanyak</span>
 							</div>
 							<div class="tools">
 								<a href="javascript:;" class="collapse">

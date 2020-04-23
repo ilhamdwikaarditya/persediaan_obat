@@ -19,12 +19,10 @@ class Welcome extends CI_Controller {
 		if($this->session->userdata('ket')<>''){
 			$data['prev']=$this->mmenu->main_menu();			
 			$this->load->view('head',$data);
-			$datax['totcust']=$this->mmenu->totcust();
-			#$datax['totlang']=$this->mmenu->totlang();
-			#$datax['totkwh']=$this->mmenu->totkwh();
-			#$datax['totrptag']=$this->mmenu->totrptag();
-			#$datax['grafikkwh']=$this->mmenu->get_grafik_kwh();
-			#$datax['grafikincome']=$this->mmenu->get_grafik_income();
+			$datax['totpasiendaftar']=$this->mmenu->totpasiendaftar();
+			$datax['totpasienhariini']=$this->mmenu->totpasienhariini();
+			$datax['totobat']=$this->mmenu->totobat();
+			$datax['totobatakanexpired']=$this->mmenu->totobatakanexpired();
 			$this->load->view('content',$datax);
 		}else{
 			$this->load->view('login');
